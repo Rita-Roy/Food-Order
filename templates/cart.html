@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #ff6f61;
+            color: #fff;
+            padding: 15px 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 0 0 10px 10px;
+            margin-top: 20px;
+        }
+
+        footer a {
+            color: #17a2b8;
+            text-decoration: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        .actions {
+            text-align: center;
+        }
+
+        .total {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .payment-button {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        button.remove {
+            background-color: #dc3545;
+        }
+
+        button.remove:hover {
+            background-color: #c82333;
+        }
+
+        /* Navigation Bar */
+        header nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 10px;
+        }
+
+        header nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        header nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation Bar -->
+    <header>
+        <h1>BredFast</h1>
+        <nav>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">Logout</a>
+                <a href="{% url 'cart-view' %}">Cart</a>
+                <a href="{% url 'home' %}">Home</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'signup' %}">Sign Up</a>
+                <a href="{% url 'home' %}">Home</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- Shopping Cart Content -->
+    <div class="container">
+        <h2>Your Cart</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.menu_item.name }}</td>
+                    <td>₹{{ item.menu_item.price }}</td>
+                    <td>
+                        <form action="{% url 'update-cart' item.menu_item.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px;">
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                    <td>₹{{ item.subtotal }}</td>
+                    <td class="actions">
+                        <form action="{% url 'remove-from-cart' item.menu_item.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="remove">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="total">
+            Total: ₹{{ total }}
+        </div>
+        <div class="payment-button">
+            <a href="{% url 'user_details' %}">
+                <button>Order Now</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Shopping Cart App. Built with ❤️ by <a href="#">BredFast</a>.</p>
+    </footer>
+</body>
+</html>
